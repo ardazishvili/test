@@ -1,0 +1,11 @@
+zero
+one
+two
+three
+Zero1
+One1
+Two1
+Three1
+exABCample of some pattern1
+example of ABC some pattern2
+example of some pattern3 ABC
