@@ -7,7 +7,22 @@ std::basic_ostream<char>& operator<<(
   const std::basic_string<char, ci_traits> str)
 {
   os << str.c_str();
+  return os;
 }
+
+void remove(nonstd::string& l, const std::string& p)
+
+{
+  std::regex specialChars{ R"([-[\]{}()*+?.,\^$|#\s])" };
+  auto sanitized = std::regex_replace(p, specialChars, R"(\$&)");
+  l = std::regex_replace(l, std::regex(sanitized), "");
+}
+
+void sort(Lines& lines)
+{
+  std::sort(lines.begin(), lines.end());
+}
+
 }
 
 Text::Text(const std::string& path) : _path(path)
@@ -25,13 +40,13 @@ Text::Text(const std::string& path) : _path(path)
 void Text::remove(const std::string& pattern)
 {
   for (auto& s : _lines) {
-    ::remove(s, pattern);
+    nonstd::remove(s, pattern);
   }
 }
 
 void Text::sort()
 {
-  ::sort(_lines);
+  nonstd::sort(_lines);
 }
 
 void Text::toFile()
@@ -40,17 +55,5 @@ void Text::toFile()
   std::copy(_lines.begin(),
             _lines.end(),
             std::ostream_iterator<nonstd::string>(outFile, "\n"));
-}
-
-void remove(nonstd::string& l, const std::string& p)
-{
-  std::regex specialChars{ R"([-[\]{}()*+?.,\^$|#\s])" };
-  auto sanitized = std::regex_replace(p, specialChars, R"(\$&)");
-  l = std::regex_replace(l, std::regex(sanitized), "");
-}
-
-void sort(Lines& lines)
-{
-  std::sort(lines.begin(), lines.end());
 }
 

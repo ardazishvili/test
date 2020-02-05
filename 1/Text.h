@@ -24,11 +24,11 @@ std::basic_ostream<char>& operator<<(
   const std::basic_string<char, ci_traits> str);
 
 using string = std::basic_string<char, ci_traits>;
-}
-
-using Lines = std::vector<nonstd::string>;
+using Lines = std::vector<string>;
 void remove(nonstd::string& l, const std::string& p);
 void sort(Lines& lines);
+}
+
 class Text
 {
 public:
@@ -44,7 +44,7 @@ public:
   void toFile();
 
 private:
-  Lines _lines;
+  nonstd::Lines _lines;
   std::string _path;
 };
 
