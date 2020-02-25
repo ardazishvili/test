@@ -1,3 +1,6 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -13,11 +16,13 @@ namespace linal
  * @tparam T element type
  * @tparam size
  *
+ * @details
  * Compilation errors by design:
  * Vector<int, 3> and Vector<int, 1> are different types so can't be added
  * @code
  * auto v = Vector<int, 3>(1, 2, 3);
  * v += Vector<int, 1>(); // error
+ * @endcode
  */
 template<typename T, int size>
 class Vector
@@ -32,12 +37,35 @@ public:
     }
   }
 
-  T at(int index)
+  /**
+   * @brief Get 'i' element
+   *
+   * @param index
+   *
+   * @return value
+   */
+  T at(int index) const
   {
     return _arr.at(index);
   }
 
-  size_t dim()
+  /**
+   * @brief Set value of Vector by given index
+   *
+   * @param index
+   * @param value
+   */
+  void set(int index, T value)
+  {
+    _arr.at(index) = value;
+  }
+
+  /**
+   * @brief Get Vector dimension
+   *
+   * @return dimension
+   */
+  size_t dim() const
   {
     return size;
   }
@@ -129,3 +157,6 @@ Vector<T, 3> cross(const Vector<T, 3>& x, const Vector<T, 3>& y)
 }
 
 using vec3 = linal::Vector<int, 3>;
+using vec2 = linal::Vector<int, 2>;
+
+#endif

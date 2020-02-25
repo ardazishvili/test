@@ -13,6 +13,7 @@ add_executable(math
 
 add_executable(unit_tests tests/unit_main.cpp
   tests/Vector_tests.cpp
+  tests/Matrix_tests.cpp
   tests/Utilities_tests.cpp
   )
 target_link_libraries(unit_tests gtest gmock)
