@@ -133,3 +133,25 @@ TEST(MatrixMultiplication, onScalar)
     EXPECT_THAT(m.at(1, 2), Eq(0));
   }
 }
+
+TEST(MatrixAddition, worksForMatricesOfSameDimensions)
+{
+  {
+    Matrix<int, 2, 2> m = Matrix<int, 2, 2>(vec2(1, 2), vec2(3, 4)) +
+                          Matrix<int, 2, 2>(vec2(5, 6), vec2(7, 8));
+    EXPECT_THAT(m.at(0, 0), Eq(5 + 1));
+    EXPECT_THAT(m.at(0, 1), Eq(6 + 2));
+    EXPECT_THAT(m.at(1, 0), Eq(7 + 3));
+    EXPECT_THAT(m.at(1, 1), Eq(8 + 4));
+  }
+  {
+    Matrix<int, 2, 3> m = Matrix<int, 2, 3>(vec3(1, 2, 3), vec3(4, 5, 6)) +
+                          Matrix<int, 2, 3>(vec3(7, 8, 9), vec3(10, 11, 12));
+    EXPECT_THAT(m.at(0, 0), Eq(7 + 1));
+    EXPECT_THAT(m.at(0, 1), Eq(8 + 2));
+    EXPECT_THAT(m.at(0, 2), Eq(9 + 3));
+    EXPECT_THAT(m.at(1, 0), Eq(10 + 4));
+    EXPECT_THAT(m.at(1, 1), Eq(11 + 5));
+    EXPECT_THAT(m.at(1, 2), Eq(12 + 6));
+  }
+}

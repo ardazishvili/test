@@ -72,6 +72,10 @@ public:
     }
   }
 
+  template<typename Q, size_t N, size_t M>
+  friend Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
+                                   const Matrix<Q, N, M>& rhs);
+
   template<typename Q, size_t N, size_t M, size_t P>
   friend Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
                                    const Matrix<Q, M, P>& rhs);
@@ -138,6 +142,20 @@ Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar)
   for (auto& row : res._rows) {
     row *= scalar;
   }
+  return res;
+}
+
+template<typename Q, size_t N, size_t M>
+Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
+                          const Matrix<Q, N, M>& rhs)
+{
+  auto res = Matrix<Q, N, M>();
+  size_t i = 0;
+  for (auto& row : res._rows) {
+    row = lhs._rows.at(i) + rhs._rows.at(i);
+    ++i;
+  }
+
   return res;
 }
 
