@@ -6,9 +6,21 @@ using ::testing::Eq;
 
 TEST(DotProduct, returnScalar)
 {
-  auto a = linal::dot(linal::Vector<int, 3>(1, 2, 3),
-                      linal::Vector<int, 3>(10, 20, 30));
-  EXPECT_THAT(a, Eq(140));
+  {
+    auto a = linal::dot(linal::Vector<int, 3>(1, 2, 3),
+                        linal::Vector<int, 3>(10, 20, 30));
+    EXPECT_THAT(a, Eq(140));
+  }
+  {
+    auto a = linal::dot(linal::Vector<int, 3>(1, 2, 3),
+                        linal::Vector<float, 3>(10.1f, 20.2f, 30.3f));
+    EXPECT_THAT(a, Eq(141.4f));
+  }
+  {
+    auto a = linal::dot(linal::Vector<float, 3>(10.1f, 20.2f, 30.3f),
+                        linal::Vector<int, 3>(1, 2, 3));
+    EXPECT_THAT(a, Eq(141.4f));
+  }
 }
 
 TEST(CrossProduct, ofCollinearVectorsReturnZeroVector)

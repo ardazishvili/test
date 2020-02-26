@@ -137,33 +137,6 @@ public:
   }
 
   /**
-   * @brief Assignment operator for 2 Vectors of same dimension
-   *
-   * @tparam U Element type
-   * @tparam S Dimension
-   * @param lhs
-   * @param rhs
-   *
-   * @return result Vector
-   */
-  template<typename U, typename Q, size_t S>
-  friend Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs);
-
-  /**
-   * @brief Mupliplication operator for a Vector and scalar value
-   *
-   * @tparam U Vector type
-   * @tparam Q Scalar type
-   * @tparam S Vector dimension
-   * @param lhs
-   * @param value Scalar value
-   *
-   * @return result Vector
-   */
-  template<typename U, typename Q, size_t S>
-  friend Vector<U, S> operator*(Vector<U, S> lhs, const Q& value);
-
-  /**
    * @brief Stream insertion operator for a Vector
    *
    * @tparam U Vector type
@@ -176,24 +149,21 @@ public:
   template<typename U, size_t S>
   friend std::ostream& operator<<(std::ostream& os, const Vector<U, S>& v);
 
-  /**
-   * @brief Dot product of 2 Vectors
-   *
-   * @tparam U Vector type
-   * @tparam S Vector dimension
-   * @param a
-   * @param b
-   *
-   * @return dot product
-   */
-  template<typename U, size_t S>
-  friend typename Vector<U, S>::type dot(const Vector<U, S>& a,
-                                         const Vector<U, S>& b);
-
 private:
   std::array<T, size> _arr;
 };
 
+/**
+ * @brief Assignment operator for 2 Vectors of same dimension
+ *
+ * @tparam U Element type of first Vector
+ * @tparam Q Element type of second Vector
+ * @tparam S Dimension
+ * @param lhs
+ * @param rhs
+ *
+ * @return result Vector
+ */
 template<typename U, typename Q, size_t S>
 Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs)
 {
@@ -201,8 +171,19 @@ Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs)
   return lhs;
 }
 
-template<typename T, typename Q, size_t size>
-Vector<T, size> operator*(Vector<T, size> lhs, const Q& value)
+/**
+ * @brief Mupliplication operator for a Vector and scalar value
+ *
+ * @tparam T Vector type
+ * @tparam Q Scalar type
+ * @tparam S Vector dimension
+ * @param lhs
+ * @param value Scalar value
+ *
+ * @return result Vector
+ */
+template<typename T, typename Q, size_t S>
+Vector<T, S> operator*(Vector<T, S> lhs, const Q& value)
 {
   lhs *= value;
   return lhs;
@@ -219,14 +200,28 @@ std::ostream& operator<<(std::ostream& os, const Vector<T, size>& v)
   return os;
 }
 
-template<typename U, size_t S>
-typename Vector<U, S>::type dot(const Vector<U, S>& a, const Vector<U, S>& b)
+/**
+ * @brief Dot product of 2 Vectors
+ *
+ * @tparam U Vector type
+ * @tparam S Vector dimension
+ * @param a
+ * @param b
+ *
+ * @return dot product
+ */
+template<typename U, typename Q, size_t S>
+auto dot(const Vector<U, S>& a, const Vector<Q, S>& b)
 {
-  return std::inner_product(a.cbegin(), a.cend(), b.cbegin(), 0);
+  return std::inner_product(
+    a.cbegin(),
+    a.cend(),
+    b.cbegin(),
+    static_cast<typename is_safe_arithmetic_conversion<U, Q>::wider_type>(0));
 }
 
-template<typename T>
-Vector<T, 3> cross(const Vector<T, 3>& x, const Vector<T, 3>& y)
+template<typename T, typename U>
+Vector<T, 3> cross(const Vector<T, 3>& x, const Vector<U, 3>& y)
 {
   auto a = x;
   auto b = y;
