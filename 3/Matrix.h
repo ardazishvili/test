@@ -80,6 +80,9 @@ public:
   friend Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs,
                                 const Vector<Q, M>& rhs);
 
+  template<typename Q, typename S, int N, int M>
+  friend Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar);
+
 private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
@@ -124,6 +127,16 @@ Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs, const Vector<Q, M>& rhs)
   for (int i = 0; i < M; ++i) {
     auto val = linal::dot(lhs._rows.at(i), rhs);
     res.set(i, val);
+  }
+  return res;
+}
+
+template<typename Q, typename S, int N, int M>
+Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar)
+{
+  auto res = lhs;
+  for (auto& row : res._rows) {
+    row *= scalar;
   }
   return res;
 }

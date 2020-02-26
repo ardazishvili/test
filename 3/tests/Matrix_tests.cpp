@@ -104,3 +104,32 @@ TEST(MatrixMultiplication, ofSquareMatriceAndVectorOfValidDimension)
     EXPECT_THAT(m.at(1), Eq(0));
   }
 }
+
+TEST(MatrixMultiplication, onScalar)
+{
+  {
+    Matrix<int, 2, 2> m = Matrix<int, 2, 2>(vec2(1, 2), vec2(3, 4)) * 42;
+    EXPECT_THAT(m.at(0, 0), Eq(42 * 1));
+    EXPECT_THAT(m.at(0, 1), Eq(42 * 2));
+    EXPECT_THAT(m.at(1, 0), Eq(42 * 3));
+    EXPECT_THAT(m.at(1, 1), Eq(42 * 4));
+  }
+
+  {
+    Matrix<int, 2, 2> m = Matrix<int, 2, 2>(vec2(1, 2), vec2(3, 4)) * (-42);
+    EXPECT_THAT(m.at(0, 0), Eq(-42 * 1));
+    EXPECT_THAT(m.at(0, 1), Eq(-42 * 2));
+    EXPECT_THAT(m.at(1, 0), Eq(-42 * 3));
+    EXPECT_THAT(m.at(1, 1), Eq(-42 * 4));
+  }
+
+  {
+    Matrix<int, 2, 3> m = Matrix<int, 2, 3>(vec3(1, 2, 3), vec3(4, 5, 6)) * 0;
+    EXPECT_THAT(m.at(0, 0), Eq(0));
+    EXPECT_THAT(m.at(0, 1), Eq(0));
+    EXPECT_THAT(m.at(0, 2), Eq(0));
+    EXPECT_THAT(m.at(1, 0), Eq(0));
+    EXPECT_THAT(m.at(1, 1), Eq(0));
+    EXPECT_THAT(m.at(1, 2), Eq(0));
+  }
+}
