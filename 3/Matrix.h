@@ -23,7 +23,7 @@ enum class MatrixType { Identity };
    * auto bad = linal::Matrix<int, 3, 3>(vec3(), vec3()) // exception thrown
    * @endcode
    */
-template<typename T, int rows_count, int columns_count>
+template<typename T, size_t rows_count, size_t columns_count>
 
 class Matrix
 {
@@ -46,12 +46,12 @@ public:
    *
    * @return value
    */
-  const T& at(int row, int column) const
+  const T& at(size_t row, size_t column) const
   {
     return _rows.at(row).at(column);
   }
 
-  void set(int row, int column, T value)
+  void set(size_t row, size_t column, T value)
   {
     _rows.at(row).set(column, value);
   }
@@ -66,40 +66,40 @@ public:
     if (rows_count != columns_count) {
       throw "can't init non-square matrix with Identity matrix";
     }
-    int i = 0;
+    size_t i = 0;
     for (auto& row : _rows) {
       row.set(i++, 1);
     }
   }
 
-  template<typename Q, int N, int M, int P>
+  template<typename Q, size_t N, size_t M, size_t P>
   friend Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
                                    const Matrix<Q, M, P>& rhs);
 
-  template<typename Q, int N, int M>
+  template<typename Q, size_t N, size_t M>
   friend Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs,
                                 const Vector<Q, M>& rhs);
 
-  template<typename Q, typename S, int N, int M>
+  template<typename Q, typename S, size_t N, size_t M>
   friend Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar);
 
 private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
 
-template<typename Q, int N, int M, int P>
+template<typename Q, size_t N, size_t M, size_t P>
 Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
                           const Matrix<Q, M, P>& rhs)
 {
   auto res = Matrix<Q, N, P>();
   auto column = std::array<const Q*, M>();
-  int k = 0;
+  size_t k = 0;
   for (auto& row : rhs._rows) {
     column.at(k++) = &row.at(0);
   }
 
-  for (int i = 0; i < P; ++i) {
-    for (int j = 0; j < N; ++j) {
+  for (size_t i = 0; i < P; ++i) {
+    for (size_t j = 0; j < N; ++j) {
       auto val = std::inner_product(lhs._rows.at(j).cbegin(),
                                     lhs._rows.at(j).cend(),
                                     column.cbegin(),
@@ -119,19 +119,19 @@ Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
   return res;
 }
 
-template<typename Q, int N, int M>
+template<typename Q, size_t N, size_t M>
 Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs, const Vector<Q, M>& rhs)
 {
   auto res = Vector<Q, M>();
 
-  for (int i = 0; i < M; ++i) {
+  for (size_t i = 0; i < M; ++i) {
     auto val = linal::dot(lhs._rows.at(i), rhs);
     res.set(i, val);
   }
   return res;
 }
 
-template<typename Q, typename S, int N, int M>
+template<typename Q, typename S, size_t N, size_t M>
 Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar)
 {
   auto res = lhs;

@@ -24,7 +24,7 @@ namespace linal
  * v += Vector<int, 1>(); // error
  * @endcode
  */
-template<typename T, int size>
+template<typename T, size_t size>
 class Vector
 {
 public:
@@ -67,7 +67,7 @@ public:
    *
    * @return value
    */
-  const T& at(int index) const
+  const T& at(size_t index) const
   {
     return _arr.at(index);
   }
@@ -78,7 +78,7 @@ public:
    * @param index
    * @param value
    */
-  void set(int index, T value)
+  void set(size_t index, T value)
   {
     _arr.at(index) = value;
   }
@@ -93,7 +93,7 @@ public:
     return size;
   }
 
-  template<typename U, int S>
+  template<typename U, size_t S>
   Vector<T, size>& operator+=(const Vector<U, S>& rhs)
   {
     auto tmp = rhs._arr;
@@ -113,13 +113,13 @@ public:
     return *this;
   }
 
-  template<typename U, int S>
+  template<typename U, size_t S>
   friend Vector<U, S> operator+(Vector<U, S> lhs, const Vector<U, S>& rhs);
 
-  template<typename U, int S>
+  template<typename U, size_t S>
   friend Vector<U, S> operator*(Vector<U, S> lhs, const U& value);
 
-  template<typename U, int S>
+  template<typename U, size_t S>
   friend std::ostream& operator<<(std::ostream& os, const Vector<U, S>& v);
 
   template<typename U>
@@ -129,21 +129,21 @@ private:
   std::array<T, size> _arr;
 };
 
-template<typename T, int size>
+template<typename T, size_t size>
 Vector<T, size> operator+(Vector<T, size> lhs, const Vector<T, size>& rhs)
 {
   lhs += rhs;
   return lhs;
 }
 
-template<typename T, int size>
+template<typename T, size_t size>
 Vector<T, size> operator*(Vector<T, size> lhs, const T& value)
 {
   lhs *= value;
   return lhs;
 }
 
-template<typename T, int size>
+template<typename T, size_t size>
 std::ostream& operator<<(std::ostream& os, const Vector<T, size>& v)
 {
   os << "{ ";
