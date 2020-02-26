@@ -110,8 +110,7 @@ public:
     if (!is_safe_arithmetic_conversion<T, U>::value) {
       throw "vectors cannot be added: narrowing of type!";
     }
-    std::transform(
-      _arr.begin(), _arr.end(), rhs.cbegin(), _arr.begin(), std::plus<T>());
+    std::transform(begin(), end(), rhs.cbegin(), begin(), std::plus<T>());
     return *this;
   }
 
@@ -130,9 +129,9 @@ public:
       throw "vectors cannot be added: narrowing of type!";
     }
     std::transform(
-      _arr.begin(),
-      _arr.end(),
-      _arr.begin(),
+      begin(),
+      end(),
+      begin(),
       std::bind(std::multiplies<T>(), std::placeholders::_1, value));
     return *this;
   }
@@ -223,7 +222,7 @@ std::ostream& operator<<(std::ostream& os, const Vector<T, size>& v)
 template<typename U, size_t S>
 typename Vector<U, S>::type dot(const Vector<U, S>& a, const Vector<U, S>& b)
 {
-  return std::inner_product(a._arr.begin(), a._arr.end(), b._arr.begin(), 0);
+  return std::inner_product(a.cbegin(), a.cend(), b.cbegin(), 0);
 }
 
 template<typename T>
