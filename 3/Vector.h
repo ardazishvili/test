@@ -7,6 +7,8 @@
 #include <iostream>
 #include <numeric>
 
+#include "traits.h"
+
 namespace linal
 {
 
@@ -65,7 +67,7 @@ public:
    *
    * @param index
    *
-   * @return value
+   * @return const ref to value
    */
   const T& at(size_t index) const
   {
@@ -93,18 +95,40 @@ public:
     return size;
   }
 
+  /**
+   * @brief Compound assignment operator
+   *
+   * @tparam U Element type
+   * @tparam S Vector size
+   * @param rhs Right hand side of operator
+   *
+   * @return ref to *this
+   */
   template<typename U, size_t S>
   Vector<T, size>& operator+=(const Vector<U, S>& rhs)
   {
-    auto tmp = rhs._arr;
+    if (!is_safe_arithmetic_conversion<T, U>::value) {
+      throw "vectors cannot be added: narrowing of type!";
+    }
     std::transform(
-      _arr.begin(), _arr.end(), tmp.begin(), _arr.begin(), std::plus<T>());
+      _arr.begin(), _arr.end(), rhs.cbegin(), _arr.begin(), std::plus<T>());
     return *this;
   }
 
+  /**
+   * @brief Compound multiplication operator
+   *
+   * @tparam U Scalar type
+   * @param Scalar value
+   *
+   * @return ref to *this
+   */
   template<typename U>
   Vector<T, size>& operator*=(const U& value)
   {
+    if (!is_safe_arithmetic_conversion<T, U>::value) {
+      throw "vectors cannot be added: narrowing of type!";
+    }
     std::transform(
       _arr.begin(),
       _arr.end(),
@@ -113,31 +137,73 @@ public:
     return *this;
   }
 
-  template<typename U, size_t S>
-  friend Vector<U, S> operator+(Vector<U, S> lhs, const Vector<U, S>& rhs);
+  /**
+   * @brief Assignment operator for 2 Vectors of same dimension
+   *
+   * @tparam U Element type
+   * @tparam S Dimension
+   * @param lhs
+   * @param rhs
+   *
+   * @return result Vector
+   */
+  template<typename U, typename Q, size_t S>
+  friend Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs);
 
-  template<typename U, size_t S>
-  friend Vector<U, S> operator*(Vector<U, S> lhs, const U& value);
+  /**
+   * @brief Mupliplication operator for a Vector and scalar value
+   *
+   * @tparam U Vector type
+   * @tparam Q Scalar type
+   * @tparam S Vector dimension
+   * @param lhs
+   * @param value Scalar value
+   *
+   * @return result Vector
+   */
+  template<typename U, typename Q, size_t S>
+  friend Vector<U, S> operator*(Vector<U, S> lhs, const Q& value);
 
+  /**
+   * @brief Stream insertion operator for a Vector
+   *
+   * @tparam U Vector type
+   * @tparam S Vector dimension
+   * @param os ref to stream
+   * @param v ref to Vector instance
+   *
+   * @return ref to stream
+   */
   template<typename U, size_t S>
   friend std::ostream& operator<<(std::ostream& os, const Vector<U, S>& v);
 
-  template<typename U>
-  friend typename U::type dot(const U& a, const U& b);
+  /**
+   * @brief Dot product of 2 Vectors
+   *
+   * @tparam U Vector type
+   * @tparam S Vector dimension
+   * @param a
+   * @param b
+   *
+   * @return dot product
+   */
+  template<typename U, size_t S>
+  friend typename Vector<U, S>::type dot(const Vector<U, S>& a,
+                                         const Vector<U, S>& b);
 
 private:
   std::array<T, size> _arr;
 };
 
-template<typename T, size_t size>
-Vector<T, size> operator+(Vector<T, size> lhs, const Vector<T, size>& rhs)
+template<typename U, typename Q, size_t S>
+Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs)
 {
   lhs += rhs;
   return lhs;
 }
 
-template<typename T, size_t size>
-Vector<T, size> operator*(Vector<T, size> lhs, const T& value)
+template<typename T, typename Q, size_t size>
+Vector<T, size> operator*(Vector<T, size> lhs, const Q& value)
 {
   lhs *= value;
   return lhs;
@@ -154,8 +220,8 @@ std::ostream& operator<<(std::ostream& os, const Vector<T, size>& v)
   return os;
 }
 
-template<typename T>
-typename T::type dot(const T& a, const T& b)
+template<typename U, size_t S>
+typename Vector<U, S>::type dot(const Vector<U, S>& a, const Vector<U, S>& b)
 {
   return std::inner_product(a._arr.begin(), a._arr.end(), b._arr.begin(), 0);
 }
