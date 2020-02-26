@@ -73,18 +73,22 @@ public:
   }
 
   template<typename Q, int N, int M, int P>
-  friend Matrix<Q, M, P> operator*(const Matrix<Q, N, M>& lhs,
+  friend Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
                                    const Matrix<Q, M, P>& rhs);
+
+  template<typename Q, int N, int M>
+  friend Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs,
+                                const Vector<Q, M>& rhs);
 
 private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
 
 template<typename Q, int N, int M, int P>
-Matrix<Q, M, P> operator*(const Matrix<Q, N, M>& lhs,
+Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
                           const Matrix<Q, M, P>& rhs)
 {
-  auto res = Matrix<Q, M, P>();
+  auto res = Matrix<Q, N, P>();
   auto column = std::array<const Q*, M>();
   int k = 0;
   for (auto& row : rhs._rows) {
@@ -109,6 +113,18 @@ Matrix<Q, M, P> operator*(const Matrix<Q, N, M>& lhs,
       });
   }
 
+  return res;
+}
+
+template<typename Q, int N, int M>
+Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs, const Vector<Q, M>& rhs)
+{
+  auto res = Vector<Q, M>();
+
+  for (int i = 0; i < M; ++i) {
+    auto val = linal::dot(lhs._rows.at(i), rhs);
+    res.set(i, val);
+  }
   return res;
 }
 
