@@ -46,9 +46,14 @@ public:
    *
    * @return value
    */
-  T at(int row, int column) const
+  const T& at(int row, int column) const
   {
     return _rows.at(row).at(column);
+  }
+
+  void set(int row, int column, T value)
+  {
+    _rows.at(row).set(column, value);
   }
 
   /**
@@ -67,9 +72,46 @@ public:
     }
   }
 
+  template<typename Q, int N, int M, int P>
+  friend Matrix<Q, M, P> operator*(const Matrix<Q, N, M>& lhs,
+                                   const Matrix<Q, M, P>& rhs);
+
 private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
+
+template<typename Q, int N, int M, int P>
+Matrix<Q, M, P> operator*(const Matrix<Q, N, M>& lhs,
+                          const Matrix<Q, M, P>& rhs)
+{
+  auto res = Matrix<Q, M, P>();
+  auto column = std::array<const Q*, M>();
+  int k = 0;
+  for (auto& row : rhs._rows) {
+    column.at(k++) = &row.at(0);
+  }
+
+  for (int i = 0; i < P; ++i) {
+    for (int j = 0; j < N; ++j) {
+      auto val = std::inner_product(lhs._rows.at(j).cbegin(),
+                                    lhs._rows.at(j).cend(),
+                                    column.cbegin(),
+                                    0,
+                                    std::plus<Q>(),
+                                    [](Q lhs, const Q* rhs) {
+                                      return lhs * (*rhs);
+                                    });
+      res.set(j, i, val);
+    }
+    std::transform(
+      column.begin(), column.end(), column.begin(), [](const Q* p) {
+        return ++p;
+      });
+  }
+
+  return res;
+}
+
 }
 
 using mat3 = linal::Matrix<int, 3, 3>;

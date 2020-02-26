@@ -29,6 +29,29 @@ class Vector
 {
 public:
   typedef T type;
+  typedef typename std::array<T, size> inner_type;
+  typedef typename inner_type::iterator iterator;
+  typedef typename inner_type::const_iterator const_iterator;
+  inline iterator begin() noexcept
+  {
+    return _arr.begin();
+  }
+
+  inline const_iterator cbegin() const noexcept
+  {
+    return _arr.cbegin();
+  }
+
+  inline iterator end() noexcept
+  {
+    return _arr.end();
+  }
+
+  inline const_iterator cend() const noexcept
+  {
+    return _arr.cend();
+  }
+
   template<typename... Args>
   Vector(Args... args) : _arr({ args... })
   {
@@ -44,7 +67,7 @@ public:
    *
    * @return value
    */
-  T at(int index) const
+  const T& at(int index) const
   {
     return _arr.at(index);
   }
@@ -134,14 +157,7 @@ std::ostream& operator<<(std::ostream& os, const Vector<T, size>& v)
 template<typename T>
 typename T::type dot(const T& a, const T& b)
 {
-  auto x = a._arr;
-  auto y = b._arr;
-  std::transform(x.begin(),
-                 x.end(),
-                 y.begin(),
-                 x.begin(),
-                 std::multiplies<typename T::type>());
-  return std::accumulate(x.begin(), x.end(), 0);
+  return std::inner_product(a._arr.begin(), a._arr.end(), b._arr.begin(), 0);
 }
 
 template<typename T>
