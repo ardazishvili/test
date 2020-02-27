@@ -20,9 +20,6 @@ TEST(VectorThrow, onTypeNarrowingWhenAdded)
 {
   auto v = Vector<int, 3>(1, 2, 3);
   EXPECT_ANY_THROW((v += Vector<float, 3>(10.1f, 20.2f, 30.3f)));
-
-  EXPECT_ANY_THROW(
-    (Vector<int, 3>(1, 2, 3) + Vector<float, 3>(10.1f, 20.2f, 30.3f)));
 }
 
 TEST(VectorThrow, onTypeNarrowingWhenMultipliedByScalar)
@@ -79,8 +76,13 @@ TEST(Vector, returnElementWiseSumWhenAdded)
     EXPECT_THAT(v.at(2), Eq(33));
   }
   {
-    // it is OK: 'int' -> 'float' without narrowing
     auto v = Vector<float, 3>(10.1f, 20.2f, 30.3f) + Vector<int, 3>(1, 2, 3);
+    EXPECT_THAT(v.at(0), Eq(11.1f));
+    EXPECT_THAT(v.at(1), Eq(22.2f));
+    EXPECT_THAT(v.at(2), Eq(33.3f));
+  }
+  {
+    auto v = Vector<int, 3>(1, 2, 3) + Vector<float, 3>(10.1f, 20.2f, 30.3f);
     EXPECT_THAT(v.at(0), Eq(11.1f));
     EXPECT_THAT(v.at(1), Eq(22.2f));
     EXPECT_THAT(v.at(2), Eq(33.3f));

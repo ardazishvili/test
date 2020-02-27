@@ -121,30 +121,28 @@ public:
     return *this;
   }
 
-  template<typename Q, size_t N, size_t M>
-  friend Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
-                                   const Matrix<Q, N, M>& rhs);
+  template<typename Q, typename L, size_t N, size_t M>
+  friend auto operator+(const Matrix<Q, N, M>& lhs, const Matrix<L, N, M>& rhs)
+    -> Matrix<typename is_safe_arithmetic_conversion<Q, L>::wider_type, N, M>;
 
   template<typename Q, typename L, size_t N, size_t M, size_t P>
-  friend Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
-                                   const Matrix<L, M, P>& rhs);
+  friend auto operator*(const Matrix<Q, N, M>& lhs, const Matrix<L, M, P>& rhs)
+    -> Matrix<typename is_safe_arithmetic_conversion<Q, L>::wider_type, N, P>;
 
   template<typename Q, size_t N, size_t M>
   friend Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs,
                                 const Vector<Q, M>& rhs);
-
-  template<typename Q, typename S, size_t N, size_t M>
-  friend Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar);
 
 private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
 
 template<typename Q, typename L, size_t N, size_t M, size_t P>
-Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
-                          const Matrix<L, M, P>& rhs)
+auto operator*(const Matrix<Q, N, M>& lhs, const Matrix<L, M, P>& rhs)
+  -> Matrix<typename is_safe_arithmetic_conversion<Q, L>::wider_type, N, P>
 {
-  auto res = Matrix<Q, N, P>();
+  auto res =
+    Matrix<typename is_safe_arithmetic_conversion<Q, L>::wider_type, N, P>();
   auto column = std::array<const L*, M>();
   size_t k = 0;
   for (auto& row : rhs._rows) {
@@ -159,7 +157,7 @@ Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
         column.cbegin(),
         static_cast<typename is_safe_arithmetic_conversion<Q, L>::wider_type>(
           0),
-        std::plus<Q>(),
+        std::plus<typename is_safe_arithmetic_conversion<Q, L>::wider_type>(),
         [](const Q& lhs, const L* rhs) {
           return lhs * (*rhs);
         });
@@ -194,9 +192,10 @@ Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar)
   return res;
 }
 
-template<typename Q, size_t N, size_t M>
-Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
-                          const Matrix<Q, N, M>& rhs)
+template<typename Q, typename L, size_t N, size_t M>
+Matrix<Q, N, M> add(const Matrix<Q, N, M>& lhs,
+                    const Matrix<L, N, M>& rhs,
+                    Int2Type<true>)
 {
   auto res = lhs;
   res += rhs;
@@ -204,12 +203,22 @@ Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
 }
 
 template<typename Q, typename L, size_t N, size_t M>
-Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
-                          const Matrix<L, N, M>& rhs)
+Matrix<L, N, M> add(const Matrix<Q, N, M>& lhs,
+                    const Matrix<L, N, M>& rhs,
+                    Int2Type<false>)
 {
-  auto res = lhs;
-  res += rhs;
+  auto res = rhs;
+  res += lhs;
   return res;
+}
+
+template<typename Q, typename L, size_t N, size_t M>
+auto operator+(const Matrix<Q, N, M>& lhs, const Matrix<L, N, M>& rhs)
+  -> Matrix<typename is_safe_arithmetic_conversion<Q, L>::wider_type, N, M>
+{
+  // if Q is a wider type add rhs to lhs, because lhs has a wider type
+  // else if L is a wider type add lhs to rhs, because rhs has a wider type
+  return add(lhs, rhs, Int2Type<is_safe_arithmetic_conversion<Q, L>::value>());
 }
 
 }

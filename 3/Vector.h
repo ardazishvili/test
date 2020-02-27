@@ -164,6 +164,26 @@ private:
   std::array<T, size> _arr;
 };
 
+template<typename U, typename Q, size_t S>
+Vector<U, S> add(const Vector<U, S>& lhs,
+                 const Vector<Q, S>& rhs,
+                 Int2Type<true>)
+{
+  auto res = lhs;
+  res += rhs;
+  return res;
+}
+
+template<typename U, typename Q, size_t S>
+Vector<Q, S> add(const Vector<U, S>& lhs,
+                 const Vector<Q, S>& rhs,
+                 Int2Type<false>)
+{
+  auto res = rhs;
+  res += lhs;
+  return res;
+}
+
 /**
  * @brief Assignment operator for 2 Vectors of same dimension
  *
@@ -176,10 +196,12 @@ private:
  * @return result Vector
  */
 template<typename U, typename Q, size_t S>
-Vector<Q, S> operator+(Vector<Q, S> lhs, const Vector<U, S>& rhs)
+auto operator+(const Vector<U, S> lhs, const Vector<Q, S>& rhs)
+  -> Vector<typename is_safe_arithmetic_conversion<U, Q>::wider_type, S>
 {
-  lhs += rhs;
-  return lhs;
+  // if U is a wider type add rhs to lhs, because lhs has a wider type
+  // else if Q is a wider type add lhs to rhs, because rhs has a wider type
+  return add(lhs, rhs, Int2Type<is_safe_arithmetic_conversion<U, Q>::value>());
 }
 
 /**

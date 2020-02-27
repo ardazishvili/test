@@ -30,4 +30,10 @@ struct is_safe_arithmetic_conversion
 {
 };
 
+template<int v>
+struct Int2Type
+{
+  enum { value = v };
+};
+
 #endif

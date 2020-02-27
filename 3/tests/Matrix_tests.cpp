@@ -38,13 +38,6 @@ TEST(MatrixThrow, onTypeNarrowingWhenMultipliedMatrix)
                     Matrix<float, 2, 2>(vecf3(1.1f, 1.1f), vecf3(1.1f, 1.1f))));
 }
 
-TEST(MatrixThrow, onTypeNarrowingWhenAdded)
-{
-  auto m = Matrix<int, 2, 2>(vec2(1, 2), vec2(3, 4));
-  EXPECT_ANY_THROW(
-    (m += Matrix<float, 2, 2>(vecf2(0.1f, 0.1f), vecf2(0.1f, 0.1f))));
-}
-
 TEST(MatrixInit, withZeroesOnEmptyConstructorArgs)
 {
   auto m = Matrix<int, 2, 2>();
@@ -116,6 +109,16 @@ TEST(MatrixMultiplication, ofRectangularMatrices)
     EXPECT_THAT(m.at(0, 1), FloatEq(70.4f));
     EXPECT_THAT(m.at(1, 0), FloatEq(152.9f));
     EXPECT_THAT(m.at(1, 1), FloatEq(169.4f));
+  }
+  {
+    Matrix<float, 2, 2> m = Matrix<int, 2, 3>(vec3(1, 2, 3), vec3(4, 5, 6)) *
+                            Matrix<float, 3, 2>(vecf2(7.1f, 8.2f),
+                                                vecf2(9.3f, 10.4f),
+                                                vecf2(11.5f, 12.6f));
+    EXPECT_THAT(m.at(0, 0), FloatEq(60.2f));
+    EXPECT_THAT(m.at(0, 1), FloatEq(66.8f));
+    EXPECT_THAT(m.at(1, 0), FloatEq(143.9f));
+    EXPECT_THAT(m.at(1, 1), FloatEq(160.4f));
   }
 }
 
@@ -228,6 +231,15 @@ TEST(MatrixAddition, worksForMatricesOfSameDimensions)
     Matrix<float, 2, 2> m =
       Matrix<float, 2, 2>(vecf2(1.1f, 2.2f), vecf2(3.3f, 4.4f)) +
       Matrix<int, 2, 2>(vec2(5, 6), vec2(7, 8));
+    EXPECT_THAT(m.at(0, 0), FloatEq(5 + 1.1));
+    EXPECT_THAT(m.at(0, 1), FloatEq(6 + 2.2));
+    EXPECT_THAT(m.at(1, 0), FloatEq(7 + 3.3));
+    EXPECT_THAT(m.at(1, 1), FloatEq(8 + 4.4));
+  }
+  {
+    Matrix<float, 2, 2> m =
+      Matrix<int, 2, 2>(vec2(5, 6), vec2(7, 8)) +
+      Matrix<float, 2, 2>(vecf2(1.1f, 2.2f), vecf2(3.3f, 4.4f));
     EXPECT_THAT(m.at(0, 0), FloatEq(5 + 1.1));
     EXPECT_THAT(m.at(0, 1), FloatEq(6 + 2.2));
     EXPECT_THAT(m.at(1, 0), FloatEq(7 + 3.3));
