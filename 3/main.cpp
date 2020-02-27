@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
   std::cout << "is_safe_numeric_conversion<float,int>= "
             << is_safe_arithmetic_conversion<float, int>::value << std::endl;
-  std::cout << "is_safe_numeric_conversion<float,int>= "
+  std::cout << "is_safe_numeric_conversion<int,float>= "
             << is_safe_arithmetic_conversion<int, float>::value << std::endl;
 
   return 0;

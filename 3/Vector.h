@@ -62,6 +62,17 @@ public:
     }
   }
 
+  template<typename Q, size_t S>
+  Vector(const Vector<Q, S>& other)
+  {
+    if (!is_safe_arithmetic_conversion<T, Q>::value) {
+      throw "vector cannot be initialized: narrowing of type!";
+    } else {
+      auto tmp = other;
+      std::copy(begin(), end(), tmp.begin());
+    }
+  }
+
   /**
    * @brief Get 'i' element
    *
@@ -234,5 +245,7 @@ Vector<T, 3> cross(const Vector<T, 3>& x, const Vector<U, 3>& y)
 
 using vec3 = linal::Vector<int, 3>;
 using vec2 = linal::Vector<int, 2>;
+using vecf2 = linal::Vector<float, 2>;
+using vecf3 = linal::Vector<float, 3>;
 
 #endif

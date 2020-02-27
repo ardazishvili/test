@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "traits.h"
 #include <array>
 #include <iostream>
 
@@ -29,6 +30,28 @@ class Matrix
 {
 public:
   typedef T type;
+  typedef typename std::array<Vector<T, columns_count>, rows_count> inner_type;
+  typedef typename inner_type::iterator iterator;
+  typedef typename inner_type::const_iterator const_iterator;
+  inline iterator begin() noexcept
+  {
+    return _rows.begin();
+  }
+
+  inline const_iterator cbegin() const noexcept
+  {
+    return _rows.cbegin();
+  }
+
+  inline iterator end() noexcept
+  {
+    return _rows.end();
+  }
+
+  inline const_iterator cend() const noexcept
+  {
+    return _rows.cend();
+  }
 
   template<typename... Args>
   Matrix(Args... args) : _rows({ args... })
@@ -73,12 +96,38 @@ public:
   }
 
   template<typename Q, size_t N, size_t M>
+  Matrix<T, rows_count, columns_count>& operator+=(const Matrix<Q, N, M>& rhs)
+  {
+    auto t = *this;
+    std::transform(begin(),
+                   end(),
+                   rhs.cbegin(),
+                   begin(),
+                   [](const Vector<T, columns_count>& lhs,
+                      const Vector<Q, columns_count>& rhs) {
+                     return lhs + rhs;
+                   });
+    auto r = *this;
+
+    return *this;
+  }
+
+  template<typename S>
+  Matrix<T, rows_count, columns_count>& operator*=(const S& scalar)
+  {
+    for (auto& row : _rows) {
+      row *= scalar;
+    }
+    return *this;
+  }
+
+  template<typename Q, size_t N, size_t M>
   friend Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
                                    const Matrix<Q, N, M>& rhs);
 
-  template<typename Q, size_t N, size_t M, size_t P>
+  template<typename Q, typename L, size_t N, size_t M, size_t P>
   friend Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
-                                   const Matrix<Q, M, P>& rhs);
+                                   const Matrix<L, M, P>& rhs);
 
   template<typename Q, size_t N, size_t M>
   friend Vector<Q, M> operator*(const Matrix<Q, N, M>& lhs,
@@ -91,12 +140,12 @@ private:
   std::array<Vector<T, columns_count>, rows_count> _rows;
 };
 
-template<typename Q, size_t N, size_t M, size_t P>
+template<typename Q, typename L, size_t N, size_t M, size_t P>
 Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
-                          const Matrix<Q, M, P>& rhs)
+                          const Matrix<L, M, P>& rhs)
 {
   auto res = Matrix<Q, N, P>();
-  auto column = std::array<const Q*, M>();
+  auto column = std::array<const L*, M>();
   size_t k = 0;
   for (auto& row : rhs._rows) {
     column.at(k++) = &row.at(0);
@@ -104,18 +153,20 @@ Matrix<Q, N, P> operator*(const Matrix<Q, N, M>& lhs,
 
   for (size_t i = 0; i < P; ++i) {
     for (size_t j = 0; j < N; ++j) {
-      auto val = std::inner_product(lhs._rows.at(j).cbegin(),
-                                    lhs._rows.at(j).cend(),
-                                    column.cbegin(),
-                                    0,
-                                    std::plus<Q>(),
-                                    [](Q lhs, const Q* rhs) {
-                                      return lhs * (*rhs);
-                                    });
+      auto val = std::inner_product(
+        lhs._rows.at(j).cbegin(),
+        lhs._rows.at(j).cend(),
+        column.cbegin(),
+        static_cast<typename is_safe_arithmetic_conversion<Q, L>::wider_type>(
+          0),
+        std::plus<Q>(),
+        [](const Q& lhs, const L* rhs) {
+          return lhs * (*rhs);
+        });
       res.set(j, i, val);
     }
     std::transform(
-      column.begin(), column.end(), column.begin(), [](const Q* p) {
+      column.begin(), column.end(), column.begin(), [](const L* p) {
         return ++p;
       });
   }
@@ -139,9 +190,7 @@ template<typename Q, typename S, size_t N, size_t M>
 Matrix<Q, N, M> operator*(const Matrix<Q, N, M>& lhs, const S& scalar)
 {
   auto res = lhs;
-  for (auto& row : res._rows) {
-    row *= scalar;
-  }
+  res *= scalar;
   return res;
 }
 
@@ -149,13 +198,17 @@ template<typename Q, size_t N, size_t M>
 Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
                           const Matrix<Q, N, M>& rhs)
 {
-  auto res = Matrix<Q, N, M>();
-  size_t i = 0;
-  for (auto& row : res._rows) {
-    row = lhs._rows.at(i) + rhs._rows.at(i);
-    ++i;
-  }
+  auto res = lhs;
+  res += rhs;
+  return res;
+}
 
+template<typename Q, typename L, size_t N, size_t M>
+Matrix<Q, N, M> operator+(const Matrix<Q, N, M>& lhs,
+                          const Matrix<L, N, M>& rhs)
+{
+  auto res = lhs;
+  res += rhs;
   return res;
 }
 

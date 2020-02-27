@@ -10,26 +10,10 @@ TEST(Vector, doesntThrowOnValidArguments)
   EXPECT_NO_THROW((Vector<float, 3>(1.0f, 2.0f, 3.0f)));
 }
 
-TEST(Vector, throwOnIncompleteArgumentList)
+TEST(VectorThrow, onIncompleteArgumentList)
 {
   EXPECT_ANY_THROW((Vector<int, 3>(1, 2)));
   EXPECT_ANY_THROW((Vector<float, 3>(1.0f, 2.0f)));
-}
-
-TEST(Vector, fillsZeroesOnEmptyArgumentList)
-{
-  auto v = Vector<int, 3>();
-  EXPECT_THAT(v.at(0), Eq(0));
-  EXPECT_THAT(v.at(1), Eq(0));
-  EXPECT_THAT(v.at(2), Eq(0));
-}
-
-TEST(Vector, fillsValuesOnNonemptyArgumentList)
-{
-  auto v = Vector<int, 3>(1, 2, 3);
-  EXPECT_THAT(v.at(0), Eq(1));
-  EXPECT_THAT(v.at(1), Eq(2));
-  EXPECT_THAT(v.at(2), Eq(3));
 }
 
 TEST(VectorThrow, onTypeNarrowingWhenAdded)
@@ -47,6 +31,22 @@ TEST(VectorThrow, onTypeNarrowingWhenMultipliedByScalar)
   EXPECT_ANY_THROW((v *= 1.1f));
 
   EXPECT_ANY_THROW((Vector<int, 3>(1, 2, 3) * 1.1f));
+}
+
+TEST(Vector, fillsZeroesOnEmptyArgumentList)
+{
+  auto v = Vector<int, 3>();
+  EXPECT_THAT(v.at(0), Eq(0));
+  EXPECT_THAT(v.at(1), Eq(0));
+  EXPECT_THAT(v.at(2), Eq(0));
+}
+
+TEST(Vector, fillsValuesOnNonemptyArgumentList)
+{
+  auto v = Vector<int, 3>(1, 2, 3);
+  EXPECT_THAT(v.at(0), Eq(1));
+  EXPECT_THAT(v.at(1), Eq(2));
+  EXPECT_THAT(v.at(2), Eq(3));
 }
 
 TEST(Vector, returnElementWiseSumWhenAddedCompound)
