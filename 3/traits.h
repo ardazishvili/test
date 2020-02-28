@@ -15,6 +15,7 @@ struct is_safe_base<true, TO, FROM> : std::true_type
   typedef TO wider_type;
 };
 
+// trait to check if type casting is safe
 template<typename TO, typename FROM>
 struct is_safe_arithmetic_conversion
   : is_safe_base<
@@ -30,6 +31,7 @@ struct is_safe_arithmetic_conversion
 {
 };
 
+// helper type from Alexandrescu book to use if/else logic at compile time
 template<int v>
 struct Int2Type
 {

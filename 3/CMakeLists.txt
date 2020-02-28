@@ -7,7 +7,6 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
 add_executable(math
   main.cpp
   Matrix.h
-  Matrix.cpp
   Vector.h
   )
 

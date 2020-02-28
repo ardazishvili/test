@@ -253,6 +253,16 @@ auto dot(const Vector<U, S>& a, const Vector<Q, S>& b)
     static_cast<typename is_safe_arithmetic_conversion<U, Q>::wider_type>(0));
 }
 
+/**
+ * @brief Cross product of 2 3D Vectors
+ *
+ * @tparam T first Vector type
+ * @tparam U second Vector type
+ * @param x first Vector ref
+ * @param y second Vector ref
+ *
+ * @return 
+ */
 template<typename T, typename U>
 Vector<T, 3> cross(const Vector<T, 3>& x, const Vector<U, 3>& y)
 {

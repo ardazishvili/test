@@ -74,6 +74,13 @@ public:
     return _rows.at(row).at(column);
   }
 
+  /**
+   * @brief Set (i, j) element
+   *
+   * @param row ~ i
+   * @param column ~ j
+   * @param value 
+   */
   void set(size_t row, size_t column, T value)
   {
     _rows.at(row).set(column, value);
@@ -107,7 +114,6 @@ public:
                       const Vector<Q, columns_count>& rhs) {
                      return lhs + rhs;
                    });
-    auto r = *this;
 
     return *this;
   }
